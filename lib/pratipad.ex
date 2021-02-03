@@ -8,9 +8,9 @@ defmodule Pratipad do
 
   ## Examples
 
-      iex> {:ok, left} = Pratipad.Protocol.GenServer.start_link(%{name: :left})
-      iex> {:ok, mid} = Pratipad.Protocol.GenServer.start_link(%{name: :mid})
-      iex> {:ok, right} = Pratipad.Protocol.GenServer.start_link(%{name: :right})
+      iex> {:ok, left} = Pratipad.start_protocol(Pratipad.Protocol.GenServer, %{name: :left})
+      iex> {:ok, mid} = Pratipad.start_protocol(Pratipad.Protocol.GenServer, %{name: :mid})
+      iex> {:ok, right} = Pratipad.start_protocol(Pratipad.Protocol.GenServer, %{name: :right})
       iex> left <|> mid <|> right
       iex> GenServer.cast(:client, {:send, [client, "hello"]})
 
@@ -23,5 +23,9 @@ defmodule Pratipad do
       GenServer.cast(lname, {:subscribe, unquote(right)})
       unquote(right)
     end
+  end
+
+  def start_protocol(protocol, options) do
+    DynamicSupervisor.start_child(Pratipad.Supervisor, {protocol, options})
   end
 end
