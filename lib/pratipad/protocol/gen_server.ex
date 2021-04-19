@@ -25,7 +25,8 @@ defmodule Pratipad.Protocol.GenServer do
   @impl true
   def handle_cast({:send, data}, state) do
     state.subscribers
-    |> Enum.each(&(publish(&1, [self(), self(), data])))
+    |> Enum.each(&publish(&1, [self(), self(), data]))
+
     {:noreply, state}
   end
 
@@ -33,8 +34,12 @@ defmodule Pratipad.Protocol.GenServer do
   def handle_info({:publish, [sender, relayer, data]}, state) do
     state.subscribers
     |> Enum.filter(&(&1 != relayer))
-    |> Enum.each(&(publish(&1, [sender, self(), data])))
-    IO.puts("#{state.options.name} received message `#{data}` from #{inspect(sender)} via #{inspect(relayer)}")
+    |> Enum.each(&publish(&1, [sender, self(), data]))
+
+    IO.puts(
+      "#{state.options.name} received message `#{data}` from #{inspect(sender)} via #{inspect(relayer)}"
+    )
+
     {:noreply, state}
   end
 
