@@ -5,7 +5,7 @@ defmodule Pratipad.MixProject do
     [
       app: :pratipad,
       version: "0.1.0",
-      elixir: "~> 1.11",
+      elixir: "~> 1.12",
       start_permanent: Mix.env() == :prod,
       deps: deps()
     ]
@@ -14,8 +14,7 @@ defmodule Pratipad.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger],
-      mod: {Pratipad.Application, []}
+      extra_applications: [:logger]
     ]
   end
 
@@ -24,7 +23,6 @@ defmodule Pratipad.MixProject do
     [
       # {:dep_from_hexpm, "~> 0.3.0"},
       # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
-      {:gen_stage, "~> 1.1.0"}
     ]
   end
 end
