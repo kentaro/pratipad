@@ -14,16 +14,15 @@ defmodule Pratipad.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger]
+      extra_applications: [:logger],
+      mod: {Pratipad.Application, []}
     ]
   end
 
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:broadway, "~> 0.6.0"},
-      {:off_broadway_otp_distribution, "~> 0.1.0",
-       github: "kentaro/off_broadway_otp_distribution", branch: "main"}
+      {:broadway, "~> 0.6.0"}
     ]
   end
 end

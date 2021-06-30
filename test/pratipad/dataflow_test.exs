@@ -17,9 +17,9 @@ defmodule Pratipad.Dataflow.Test do
     dataflow = TestDataflow.declare()
 
     assert dataflow == %Dataflow{
-      input: Input,
-      processors: [TestProcessor],
-      output: Output
-    }
+             input: Input,
+             processors: [TestProcessor],
+             output: Output
+           }
   end
 end

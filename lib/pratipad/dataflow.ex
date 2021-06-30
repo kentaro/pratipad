@@ -25,10 +25,10 @@ defmodule Pratipad.Dataflow do
 
       defp handle_flow_op(%Dataflow{input: Input} = left, Output = right) do
         %Dataflow{
-            input: left.input,
-            processors: left.processors,
-            output: right
-          }
+          input: left.input,
+          processors: left.processors,
+          output: right
+        }
       end
 
       defp handle_flow_op(%Dataflow{input: Input} = left, right) do
