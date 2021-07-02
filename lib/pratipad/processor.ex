@@ -3,6 +3,7 @@ defmodule Pratipad.Processor do
     quote do
       use GenServer
 
+      @impl GenServer
       def init(_opts) do
         {:ok, nil}
       end
