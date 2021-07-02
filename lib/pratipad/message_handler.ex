@@ -15,7 +15,7 @@ defmodule Pratipad.MessageHandler do
      }}
   end
 
-  def start_link(_opts) do
-    GenServer.start_link(__MODULE__, nil)
+  def start_link(opts) do
+    GenServer.start_link(__MODULE__, opts)
   end
 end
