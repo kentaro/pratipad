@@ -6,7 +6,7 @@ defmodule Pratipad.Broadway do
   end
 
   @impl Broadway
-  def handle_message(_, msg, _context) do
-    GenServer.call(Pratipad.MessageHandler, {:process, msg})
+  def handle_message(_, message, _context) do
+    GenServer.call(Pratipad.MessageHandler, {:process, message})
   end
 end

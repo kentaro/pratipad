@@ -9,12 +9,14 @@ defmodule Pratipad do
   @dataflow_module Application.get_env(:pratipad, :dataflow, Pratipad.Dataflow.Noop)
 
   def init(_opts \\ []) do
-    {:ok, broadway} = start_broadway()
+    {:ok, forward} = start_broadway()
     {:ok, handler} = start_message_handler()
 
     {:ok,
      %{
-       broadway: broadway,
+       broadway: %{
+         forward: forward
+       },
        handler: handler
      }}
   end
@@ -22,7 +24,7 @@ defmodule Pratipad do
   defp start_broadway() do
     DynamicSupervisor.start_child(Pratipad.Supervisor, {
       Pratipad.Broadway,
-      @broadway_config
+      @broadway_config[:forward]
     })
   end
 
@@ -37,18 +39,5 @@ defmodule Pratipad do
 
   def start_link(opts \\ []) do
     GenServer.start_link(__MODULE__, opts)
-  end
-
-  @doc """
-  Hello world.
-
-  ## Examples
-
-      iex> Pratipad.hello()
-      :world
-
-  """
-  def hello do
-    :world
   end
 end

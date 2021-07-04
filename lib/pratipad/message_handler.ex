@@ -17,13 +17,13 @@ defmodule Pratipad.MessageHandler do
   end
 
   def start_link(opts) do
-    GenServer.start_link(__MODULE__, opts)
+    GenServer.start_link(__MODULE__, opts, name: __MODULE__)
   end
 
   @impl GenServer
   def handle_call({:process, message}, _from, state) do
     message =
-      state.dataflow.processor
+      state.dataflow.processors
       |> Enum.reduce(message, fn processor, message ->
         GenServer.call(processor, {:process, message})
       end)
