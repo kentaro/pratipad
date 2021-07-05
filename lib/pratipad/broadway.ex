@@ -1,5 +1,6 @@
 defmodule Pratipad.Broadway do
   use Broadway
+  require Logger
 
   def start_link(opts \\ []) do
     Broadway.start_link(__MODULE__, [name: __MODULE__] ++ opts)
@@ -8,5 +9,8 @@ defmodule Pratipad.Broadway do
   @impl Broadway
   def handle_message(_, message, _context) do
     GenServer.call(Pratipad.MessageHandler, {:process, message})
+    |> tap(fn message ->
+      Logger.debug("handled: #{inspect(message)}")
+    end)
   end
 end

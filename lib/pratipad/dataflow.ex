@@ -1,7 +1,15 @@
 defmodule Pratipad.Dataflow do
   @callback declare() :: Pratipad.Dataflow
 
-  defstruct [:input, :processors, :output]
+  defstruct [:input, :forward, :backward, :output]
+
+  defmodule Forward do
+    defstruct [:processors]
+  end
+
+  defmodule Backward do
+    defstruct [:processors]
+  end
 
   defmacro __using__(_opts) do
     quote do
@@ -12,29 +20,35 @@ defmodule Pratipad.Dataflow do
 
       defmacro left ~> right do
         quote do
-          handle_flow_op(unquote(left), unquote(right))
+          handle_unidirectional_op(unquote(left), unquote(right))
         end
       end
 
-      defp handle_flow_op(Input = left, right) do
+      defp handle_unidirectional_op(Input = left, right) do
         %Dataflow{
           input: left,
-          processors: [right]
+          forward: %Forward{
+            processors: [right]
+          }
         }
       end
 
-      defp handle_flow_op(%Dataflow{input: Input} = left, Output = right) do
+      defp handle_unidirectional_op(%Dataflow{input: Input} = left, Output = right) do
         %Dataflow{
           input: left.input,
-          processors: left.processors,
+          forward: %Forward{
+            processors: left.forward.processors,
+          },
           output: right
         }
       end
 
-      defp handle_flow_op(%Dataflow{input: Input} = left, right) do
+      defp handle_unidirectional_op(%Dataflow{input: Input} = left, right) do
         %Dataflow{
           input: left.input,
-          processors: [left.processors ++ right]
+          forward: %Forward{
+            processors: [left.forward.processors ++ right]
+          },
         }
       end
     end

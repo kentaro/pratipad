@@ -5,7 +5,7 @@ defmodule Pratipad.MessageHandler do
   def init(opts) do
     dataflow = opts[:dataflow]
 
-    dataflow.processors
+    dataflow.forward.processors
     |> Enum.each(fn processor ->
       processor.start_link()
     end)
@@ -23,7 +23,7 @@ defmodule Pratipad.MessageHandler do
   @impl GenServer
   def handle_call({:process, message}, _from, state) do
     message =
-      state.dataflow.processors
+      state.dataflow.forward.processors
       |> Enum.reduce(message, fn processor, message ->
         GenServer.call(processor, {:process, message})
       end)
