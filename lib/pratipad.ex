@@ -10,14 +10,16 @@ defmodule Pratipad do
 
   def init(_opts \\ []) do
     {:ok, forward} = start_broadway()
-    {:ok, handler} = start_message_handler()
+    {:ok, message_handler} = start_message_handler()
+    # {:ok, batch_handler} = start_batch_handler()
 
     {:ok,
      %{
        broadway: %{
          forward: forward
        },
-       handler: handler
+       message_handler: message_handler,
+      #  batch_handler: batch_handler
      }}
   end
 
@@ -33,6 +35,15 @@ defmodule Pratipad do
 
     DynamicSupervisor.start_child(Pratipad.Supervisor, {
       Pratipad.MessageHandler,
+      dataflow: dataflow
+    })
+  end
+
+  defp start_batch_handler() do
+    dataflow = @dataflow_module.declare()
+
+    DynamicSupervisor.start_child(Pratipad.Supervisor, {
+      Pratipad.BatchHandler,
       dataflow: dataflow
     })
   end

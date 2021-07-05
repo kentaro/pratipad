@@ -4,11 +4,11 @@ defmodule Pratipad.Dataflow do
   defstruct [:input, :forward, :backward, :output]
 
   defmodule Forward do
-    defstruct [:processors]
+    defstruct [:processors, :batcher]
   end
 
   defmodule Backward do
-    defstruct [:processors]
+    defstruct [:processors, :batcher]
   end
 
   defmacro __using__(_opts) do
@@ -34,10 +34,15 @@ defmodule Pratipad.Dataflow do
       end
 
       defp handle_unidirectional_op(%Dataflow{input: Input} = left, Output = right) do
+        [batcher | processors] =
+          left.forward.processors
+          |> Enum.reverse()
+
         %Dataflow{
           input: left.input,
           forward: %Forward{
-            processors: left.forward.processors,
+            processors: processors |> Enum.reverse(),
+            batcher: batcher
           },
           output: right
         }
@@ -47,7 +52,7 @@ defmodule Pratipad.Dataflow do
         %Dataflow{
           input: left.input,
           forward: %Forward{
-            processors: [left.forward.processors ++ right]
+            processors: left.forward.processors ++ [right]
           },
         }
       end

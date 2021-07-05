@@ -2,14 +2,14 @@ defmodule Pratipad.Dataflow.Test do
   use ExUnit.Case
 
   alias Pratipad.Dataflow
-  alias Pratipad.Dataflow.{Input, Output}
+  alias Pratipad.Dataflow.{Input, Output, Forward}
 
   defmodule TestDataflow do
     use Pratipad.Dataflow
     alias Pratipad.Dataflow.{Input, Output}
 
     def declare() do
-      Input ~> TestProcessor ~> Output
+      Input ~> TestProcessor ~> TestBatcher ~> Output
     end
   end
 
@@ -18,7 +18,10 @@ defmodule Pratipad.Dataflow.Test do
 
     assert dataflow == %Dataflow{
              input: Input,
-             processors: [TestProcessor],
+             forward: %Forward{
+               processors: [TestProcessor],
+               batcher: TestBatcher
+             },
              output: Output
            }
   end

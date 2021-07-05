@@ -14,7 +14,10 @@ config :pratipad,
            ]}
       ],
       processors: [
-        default: []
+        default: [concurrency: 1]
+      ],
+      batchers: [
+        default: [concurrency: 1, batch_size: 3]
       ]
     ]
   ],
