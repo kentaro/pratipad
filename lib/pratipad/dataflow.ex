@@ -1,6 +1,4 @@
 defmodule Pratipad.Dataflow do
-  @callback declare() :: Pratipad.Dataflow
-
   defstruct [:input, :forward, :backward, :output]
 
   defmodule Forward do
@@ -11,12 +9,15 @@ defmodule Pratipad.Dataflow do
     defstruct [:processors, :batcher]
   end
 
-  defmacro __using__(_opts) do
+  defmacro __using__(opts \\ [behaviour: true]) do
     quote do
+      if unquote(opts[:behaviour]) do
+        @callback declare() :: Pratipad.Dataflow
+        @behaviour Pratipad.Dataflow
+      end
+
       alias Pratipad.Dataflow
       alias Pratipad.Dataflow.{Input, Output}
-
-      @behaviour Pratipad.Dataflow
 
       defmacro left ~> right do
         quote do
@@ -53,7 +54,7 @@ defmodule Pratipad.Dataflow do
           input: left.input,
           forward: %Forward{
             processors: left.forward.processors ++ [right]
-          },
+          }
         }
       end
     end
