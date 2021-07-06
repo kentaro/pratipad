@@ -1,5 +1,5 @@
-defmodule Pratipad.Processor do
-  @callback process(message :: term) :: message :: term
+defmodule Pratipad.Batcher do
+  @callback process(messages :: term) :: messages :: term
 
   defmacro __using__(_opts) do
     quote do
@@ -18,12 +18,9 @@ defmodule Pratipad.Processor do
       end
 
       @impl GenServer
-      def handle_call({:process, message}, _from, state) do
-        message =
-          message
-          |> Message.update_data(&process/1)
-
-        {:reply, message, state}
+      def handle_call({:process, messages}, _from, state) do
+        messages = messages |> process()
+        {:reply, messages, state}
       end
     end
   end

@@ -1,8 +1,8 @@
 defmodule SimpleDataflow.Processor do
   use Pratipad.Processor
 
-  def process(data) do
-    "[#{today()}] #{data}"
+  def process(message) do
+    "[#{today()}] #{message}"
   end
 
   defp today() do

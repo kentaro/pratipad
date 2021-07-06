@@ -11,7 +11,7 @@ defmodule Pratipad do
   def init(_opts \\ []) do
     {:ok, forward} = start_broadway()
     {:ok, message_handler} = start_message_handler()
-    # {:ok, batch_handler} = start_batch_handler()
+    {:ok, batch_handler} = start_batch_handler()
 
     {:ok,
      %{
@@ -19,7 +19,7 @@ defmodule Pratipad do
          forward: forward
        },
        message_handler: message_handler,
-      #  batch_handler: batch_handler
+       batch_handler: batch_handler
      }}
   end
 
