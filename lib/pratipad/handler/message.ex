@@ -1,4 +1,4 @@
-defmodule Pratipad.MessageHandler do
+defmodule Pratipad.Handler.Message do
   use GenServer
 
   @impl GenServer

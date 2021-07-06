@@ -1,4 +1,4 @@
-defmodule Pratipad.Broadway do
+defmodule Pratipad.Broadway.Backward do
   use Broadway
   require Logger
   alias Broadway.Message
@@ -10,7 +10,6 @@ defmodule Pratipad.Broadway do
   @impl Broadway
   def handle_message(_, message, _context) do
     message
-    |> process_message()
     |> Message.put_batcher(:default)
   end
 
@@ -20,15 +19,8 @@ defmodule Pratipad.Broadway do
     |> send_batch()
   end
 
-  defp process_message(message) do
-    GenServer.call(Pratipad.MessageHandler, {:process, message})
-    |> tap(fn message ->
-      Logger.debug("handle_message: #{inspect(message)}")
-    end)
-  end
-
   defp send_batch(messages) do
-    GenServer.call(Pratipad.BatchHandler, {:process, messages})
+    GenServer.call(Pratipad.Handler.Backward, {:process, messages})
     |> tap(fn result ->
       Logger.debug("handle_batch: #{inspect(result)}")
     end)

@@ -1,11 +1,7 @@
 defmodule Pratipad.Dataflow do
-  defstruct [:input, :forward, :backward, :output]
+  defstruct [:input, :forward, :backward_enabled, :output]
 
   defmodule Forward do
-    defstruct [:processors, :batcher]
-  end
-
-  defmodule Backward do
     defstruct [:processors, :batcher]
   end
 
@@ -25,13 +21,25 @@ defmodule Pratipad.Dataflow do
         end
       end
 
+      defmacro left <~> right do
+        quote do
+          handle_bidirectional_op(unquote(left), unquote(right))
+        end
+      end
+
       defp handle_unidirectional_op(Input = left, right) do
         %Dataflow{
           input: left,
           forward: %Forward{
             processors: [right]
-          }
+          },
+          backward_enabled: false
         }
+      end
+
+      defp handle_bidirectional_op(left, right) do
+        handle_unidirectional_op(left, right)
+        |> Map.put(:backward_enabled, true)
       end
 
       defp handle_unidirectional_op(%Dataflow{input: Input} = left, Output = right) do
@@ -45,6 +53,7 @@ defmodule Pratipad.Dataflow do
             processors: processors |> Enum.reverse(),
             batcher: batcher
           },
+          backward_enabled: false,
           output: right
         }
       end
@@ -54,7 +63,8 @@ defmodule Pratipad.Dataflow do
           input: left.input,
           forward: %Forward{
             processors: left.forward.processors ++ [right]
-          }
+          },
+          backward_enabled: false
         }
       end
     end

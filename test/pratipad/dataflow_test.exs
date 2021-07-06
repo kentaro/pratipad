@@ -17,6 +17,7 @@ defmodule Pratipad.Dataflow.Test do
                  processors: [TestProcessor],
                  batcher: TestBatcher
                },
+               backward_enabled: false,
                output: Output
              }
     end
@@ -30,6 +31,21 @@ defmodule Pratipad.Dataflow.Test do
                  processors: [TestProcessor1, TestProcessor2],
                  batcher: TestBatcher
                },
+               backward_enabled: false,
+               output: Output
+             }
+    end
+
+    test "dataflow supports backward data flow" do
+      dataflow = Input <~> TestProcessor <~> TestBatcher <~> Output
+
+      assert dataflow == %Dataflow{
+               input: Input,
+               forward: %Forward{
+                 processors: [TestProcessor],
+                 batcher: TestBatcher
+               },
+               backward_enabled: true,
                output: Output
              }
     end

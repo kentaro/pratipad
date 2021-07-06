@@ -1,4 +1,4 @@
-defmodule Pratipad.BatchHandler do
+defmodule Pratipad.Handler.Batch do
   use GenServer
 
   @impl GenServer
