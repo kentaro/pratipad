@@ -9,7 +9,7 @@ config :pratipad,
          [
            mode: :push,
            receiver: [
-             name: :pratipad_receiver_forward
+             name: :pratipad_receiver_forwarder
            ]
          ]}
     ],
@@ -27,7 +27,7 @@ config :pratipad,
          [
            mode: :push,
            receiver: [
-             name: :pratipad_receiver_backward
+             name: :pratipad_receiver_backwarder
            ]
          ]}
     ],

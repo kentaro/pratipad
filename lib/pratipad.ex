@@ -4,6 +4,7 @@ defmodule Pratipad do
   """
 
   use GenServer
+  require Logger
 
   @forward_config Application.get_env(:pratipad, :forward)
   @backward_config Application.get_env(:pratipad, :backward)

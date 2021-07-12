@@ -4,6 +4,6 @@ defmodule SimpleDataflow.Dataflow do
   alias SimpleDataflow.{Processor, Batcher}
 
   def declare() do
-    Input ~> Processor ~> Batcher ~> Output
+    Input <~> Processor <~> Batcher <~> Output
   end
 end

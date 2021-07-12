@@ -23,8 +23,7 @@ defmodule SimpleDataflow.MixProject do
   defp deps do
     [
       {:pratipad, path: "../../", override: true},
-      {:off_broadway_otp_distribution, "~> 0.1.0",
-       github: "kentaro/off_broadway_otp_distribution", branch: "main"}
+      {:off_broadway_otp_distribution, path: "../../../off_broadway_otp_distribution", override: true}
     ]
   end
 end
