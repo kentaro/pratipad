@@ -4,8 +4,34 @@ defmodule Pratipad.Dataflow.Test do
   alias Pratipad.Dataflow
   alias Pratipad.Dataflow.{Input, Output, Forward}
 
-  describe "declare dataflow" do
-    use Pratipad.Dataflow, behaviour: false
+  describe "declare dataflow with module" do
+    defmodule TestDataflow do
+      use Pratipad.Dataflow
+      alias Pratipad.Dataflow.{Input, Output}
+
+      def declare() do
+        Input ~> TestProcessor ~> TestBatcher ~> Output
+      end
+    end
+
+    test "dataflow has a single processor" do
+      dataflow = TestDataflow.declare()
+
+      assert dataflow == %Dataflow{
+               input: Input,
+               forward: %Forward{
+                 processors: [TestProcessor],
+                 batcher: TestBatcher
+               },
+               backward_enabled: false,
+               output: Output
+             }
+    end
+  end
+
+  describe "declare dataflow with DSL" do
+    use Pratipad.Dataflow.DSL
+    alias Pratipad.Dataflow
     alias Pratipad.Dataflow.{Input, Output}
 
     test "dataflow has a single processor" do
