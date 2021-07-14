@@ -14,13 +14,13 @@ defmodule Pratipad.Broadway.Backward do
   end
 
   @impl Broadway
-  def handle_batch(:default, messages, _batch_info, _context) do
+  def handle_batch(:default, messages, _batch_info, context) do
     messages
-    |> send_batch()
+    |> send_batch(context)
   end
 
-  defp send_batch(messages) do
-    GenServer.call(Pratipad.Handler.Backward, {:process, messages})
+  defp send_batch(messages, context) do
+    GenServer.call(context[:output_handler], {:process, messages})
     |> tap(fn result ->
       Logger.debug("handle_batch: #{inspect(result)}")
     end)

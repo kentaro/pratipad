@@ -1,22 +1,24 @@
-defmodule Pratipad.Handler.Backward do
+defmodule Pratipad.Handler.Output do
   use GenServer
   require Logger
 
   @impl GenServer
-  def init(_opts \\ []) do
-    :global.register_name(__MODULE__, self())
+  def init(opts \\ []) do
+    name = opts[:name]
+    :global.register_name(name, self())
+
     {:ok, %{clients: []}}
   end
 
   def start_link(opts) do
-    GenServer.start_link(__MODULE__, opts, name: __MODULE__)
+    GenServer.start_link(__MODULE__, opts, name: opts[:name])
   end
 
   @impl GenServer
   def handle_call(:register, client, state) do
     {client_pid, _} = client
     Process.monitor(client_pid)
-    Logger.debug("register: #{inspect(client)}")
+    Logger.debug("[output] register: #{inspect(client)}")
 
     {:reply, :ok, %{state | clients: [client | state.clients]}}
   end
@@ -25,7 +27,7 @@ defmodule Pratipad.Handler.Backward do
   def handle_call(:unregister, client, state) do
     {client_pid, _} = client
     clients = unregister_client(state, client_pid)
-    Logger.debug("unregister: #{inspect(client)}")
+    Logger.debug("[output] unregister: #{inspect(client)}")
 
     {:reply, :ok, %{state | clients: clients}}
   end
@@ -35,8 +37,8 @@ defmodule Pratipad.Handler.Backward do
     messages
     |> Enum.each(fn message ->
       state.clients
-      |> Enum.each(fn client ->
-        GenServer.call(client, {:backward_message, message})
+      |> Enum.each(fn {client_pid, _} ->
+        GenServer.cast(client_pid, {:backward_message, message})
       end)
     end)
 
@@ -45,13 +47,14 @@ defmodule Pratipad.Handler.Backward do
 
   @impl GenServer
   def handle_info({:DOWN, ref, _, pid, reason}, state) do
-    Logger.error("Client down (#{reason}): #{inspect(ref)}, #{inspect(pid)}")
+    Logger.error("client down (#{reason}): #{inspect(ref)}, #{inspect(pid)}")
     clients = unregister_client(state.clients, pid)
+
     {:noreply, %{state | clients: clients}}
   end
 
-  defp unregister_client(state, client_pid) do
-    state.clients
+  defp unregister_client(clients, client_pid) do
+    clients
     |> Enum.filter(fn {pid, _} ->
       pid != client_pid
     end)

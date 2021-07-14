@@ -8,27 +8,27 @@ defmodule Pratipad.Broadway.Forward do
   end
 
   @impl Broadway
-  def handle_message(_, message, _context) do
+  def handle_message(_, message, context) do
     message
-    |> process_message()
+    |> process_message(context)
     |> Message.put_batcher(:default)
   end
 
   @impl Broadway
-  def handle_batch(:default, messages, _batch_info, _context) do
+  def handle_batch(:default, messages, _batch_info, context) do
     messages
-    |> send_batch()
+    |> send_batch(context)
   end
 
-  defp process_message(message) do
-    GenServer.call(Pratipad.Handler.Message, {:process, message})
+  defp process_message(message, context) do
+    GenServer.call(context[:message_handler], {:process, message})
     |> tap(fn message ->
       Logger.debug("handle_message: #{inspect(message)}")
     end)
   end
 
-  defp send_batch(messages) do
-    GenServer.call(Pratipad.Handler.Batch, {:process, messages})
+  defp send_batch(messages, context) do
+    GenServer.call(context[:output_handler], {:process, messages})
     |> tap(fn result ->
       Logger.debug("handle_batch: #{inspect(result)}")
     end)

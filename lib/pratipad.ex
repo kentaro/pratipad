@@ -30,36 +30,45 @@ defmodule Pratipad do
   end
 
   defp start_broadway_for(:forward, config, dataflow) do
+    {:ok, message_handler} = start_message_handler(dataflow)
+    {:ok, output_handler} = start_output_handler(config[:output])
+
     {:ok, broadway} =
       DynamicSupervisor.start_child(Pratipad.Supervisor, {
         Pratipad.Broadway.Forward,
-        config
+        config[:input] ++ [
+          context: [
+            message_handler: message_handler,
+            output_handler: output_handler
+          ]
+        ]
       })
-
-    {:ok, message_handler} = start_message_handler(dataflow)
-    {:ok, batch_handler} = start_batch_handler(dataflow)
 
     %{
       broadway: broadway,
       message_handler: message_handler,
-      batch_handler: batch_handler
+      output_handler: output_handler
     }
   end
 
   defp start_broadway_for(:backward, config, dataflow) do
     cond do
       config && dataflow.backward_enabled ->
+        {:ok, output_handler} = start_output_handler(config[:output])
+
         {:ok, broadway} =
           DynamicSupervisor.start_child(Pratipad.Supervisor, {
             Pratipad.Broadway.Backward,
-            config
+            config[:input] ++ [
+              context: [
+                output_handler: output_handler
+              ]
+            ]
           })
-
-        {:ok, backward_handler} = start_backward_handler()
 
         %{
           broadway: broadway,
-          backward_handler: backward_handler
+          output_handler: output_handler
         }
 
       !config != !dataflow.backward_enabled ->
@@ -79,17 +88,10 @@ defmodule Pratipad do
     })
   end
 
-  defp start_batch_handler(dataflow) do
+  defp start_output_handler(opts) do
     DynamicSupervisor.start_child(Pratipad.Supervisor, {
-      Pratipad.Handler.Batch,
-      dataflow: dataflow
-    })
-  end
-
-  defp start_backward_handler() do
-    DynamicSupervisor.start_child(Pratipad.Supervisor, {
-      Pratipad.Handler.Backward,
-      nil
+      Pratipad.Handler.Output,
+      opts
     })
   end
 end
