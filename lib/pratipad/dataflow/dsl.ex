@@ -32,15 +32,10 @@ defmodule Pratipad.Dataflow.DSL do
       end
 
       defp handle_unidirectional_op(%Dataflow{input: Input} = left, Output = right) do
-        [batcher | processors] =
-          left.forward.processors
-          |> Enum.reverse()
-
         %Dataflow{
           input: left.input,
           forward: %Forward{
-            processors: processors |> Enum.reverse(),
-            batcher: batcher
+            processors: left.forward.processors
           },
           backward_enabled: false,
           output: right

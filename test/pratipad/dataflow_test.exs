@@ -10,7 +10,7 @@ defmodule Pratipad.Dataflow.Test do
       alias Pratipad.Dataflow.{Input, Output}
 
       def declare() do
-        Input ~> TestProcessor ~> TestBatcher ~> Output
+        Input ~> TestProcessor ~> Output
       end
     end
 
@@ -21,7 +21,6 @@ defmodule Pratipad.Dataflow.Test do
                input: Input,
                forward: %Forward{
                  processors: [TestProcessor],
-                 batcher: TestBatcher
                },
                backward_enabled: false,
                output: Output
@@ -35,13 +34,12 @@ defmodule Pratipad.Dataflow.Test do
     alias Pratipad.Dataflow.{Input, Output}
 
     test "dataflow has a single processor" do
-      dataflow = Input ~> TestProcessor ~> TestBatcher ~> Output
+      dataflow = Input ~> TestProcessor ~> Output
 
       assert dataflow == %Dataflow{
                input: Input,
                forward: %Forward{
                  processors: [TestProcessor],
-                 batcher: TestBatcher
                },
                backward_enabled: false,
                output: Output
@@ -49,13 +47,12 @@ defmodule Pratipad.Dataflow.Test do
     end
 
     test "dataflow has multiple processors" do
-      dataflow = Input ~> TestProcessor1 ~> TestProcessor2 ~> TestBatcher ~> Output
+      dataflow = Input ~> TestProcessor1 ~> TestProcessor2 ~> Output
 
       assert dataflow == %Dataflow{
                input: Input,
                forward: %Forward{
                  processors: [TestProcessor1, TestProcessor2],
-                 batcher: TestBatcher
                },
                backward_enabled: false,
                output: Output
@@ -63,13 +60,12 @@ defmodule Pratipad.Dataflow.Test do
     end
 
     test "dataflow supports backward data flow" do
-      dataflow = Input <~> TestProcessor <~> TestBatcher <~> Output
+      dataflow = Input <~> TestProcessor <~> Output
 
       assert dataflow == %Dataflow{
                input: Input,
                forward: %Forward{
                  processors: [TestProcessor],
-                 batcher: TestBatcher
                },
                backward_enabled: true,
                output: Output
