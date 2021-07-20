@@ -1,5 +1,5 @@
 defmodule Pratipad.Processor do
-  @callback process(message :: term) :: message :: term
+  @callback process(message :: term(), state :: term()) :: message :: term()
 
   defmacro __using__(_opts) do
     quote do
@@ -18,7 +18,9 @@ defmodule Pratipad.Processor do
       def handle_call({:process, message}, _from, state) do
         message =
           message
-          |> Message.update_data(&process/1)
+          |> Message.update_data(fn message ->
+            process(message, state)
+          end)
 
         {:reply, message, state}
       end
