@@ -7,10 +7,7 @@ defmodule Pratipad.Processor do
       require Logger
       alias Broadway.Message
 
-      @impl GenServer
-      def init(_opts) do
-        {:ok, nil}
-      end
+      @behaviour Pratipad.Processor
 
       def start_link(opts \\ []) do
         name = opts[:name] || __MODULE__

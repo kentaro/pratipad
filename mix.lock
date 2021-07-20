@@ -1,7 +1,5 @@
 %{
   "broadway": {:hex, :broadway, "0.6.2", "ef8e0d257420c72f0e600958cf95556835d9921ad14be333493083226458791a", [:mix], [{:gen_stage, "~> 1.0", [hex: :gen_stage, repo: "hexpm", optional: false]}, {:telemetry, "~> 0.4.0", [hex: :telemetry, repo: "hexpm", optional: false]}], "hexpm", "f4f93704304a736c984cd6ed884f697415f68eb50906f4dc5d641926366ad8fa"},
-  "cll": {:hex, :cll, "0.1.1", "1acb51b9e34f631a3cd61ac3d66817ad6a9f283a28d8c0057f235079d696b4ee", [:mix], [], "hexpm", "293434c730b34bbee79f7505a49fbb5c8704500dc9a6a448cb0f007450de3215"},
   "gen_stage": {:hex, :gen_stage, "1.1.0", "dd0c0f8d2f3b993fdbd3d58e94abbe65380f4e78bdee3fa93d5618d7d14abe60", [:mix], [], "hexpm", "7f2b36a6d02f7ef2ba410733b540ec423af65ec9c99f3d1083da508aca3b9305"},
-  "off_broadway_otp_distribution": {:git, "https://github.com/kentaro/off_broadway_otp_distribution.git", "6d170a7ccace0524d922461866c7035a843b9fa4", [branch: "main"]},
   "telemetry": {:hex, :telemetry, "0.4.3", "a06428a514bdbc63293cd9a6263aad00ddeb66f608163bdec7c8995784080818", [:rebar3], [], "hexpm", "eb72b8365ffda5bed68a620d1da88525e326cb82a75ee61354fc24b844768041"},
 }

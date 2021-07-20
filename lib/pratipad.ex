@@ -6,16 +6,16 @@ defmodule Pratipad do
   use GenServer
   require Logger
 
-  @forward_config Application.get_env(:pratipad, :forward)
-  @backward_config Application.get_env(:pratipad, :backward)
-  @dataflow_module Application.get_env(:pratipad, :dataflow, Pratipad.Dataflow.Noop)
-
   @impl GenServer
   def init(_opts \\ []) do
-    dataflow = @dataflow_module.declare()
+    forward_config = Application.fetch_env!(:pratipad, :forward)
+    backward_config = Application.fetch_env!(:pratipad, :backward)
+    dataflow_module = Application.fetch_env!(:pratipad, :dataflow)
 
-    forward = start_broadway_for(:forward, @forward_config, dataflow)
-    backward = start_broadway_for(:backward, @backward_config, dataflow)
+    dataflow = dataflow_module.declare()
+
+    forward = start_broadway_for(:forward, forward_config, dataflow)
+    backward = start_broadway_for(:backward, backward_config, dataflow)
 
     {:ok,
      %{
