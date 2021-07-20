@@ -20,7 +20,7 @@ defmodule Pratipad.Dataflow.Test do
       assert dataflow == %Dataflow{
                input: Input,
                forward: %Forward{
-                 processors: [TestProcessor],
+                 processors: [TestProcessor]
                },
                backward_enabled: false,
                output: Output
@@ -39,7 +39,7 @@ defmodule Pratipad.Dataflow.Test do
       assert dataflow == %Dataflow{
                input: Input,
                forward: %Forward{
-                 processors: [TestProcessor],
+                 processors: [TestProcessor]
                },
                backward_enabled: false,
                output: Output
@@ -52,7 +52,7 @@ defmodule Pratipad.Dataflow.Test do
       assert dataflow == %Dataflow{
                input: Input,
                forward: %Forward{
-                 processors: [TestProcessor1, TestProcessor2],
+                 processors: [TestProcessor1, TestProcessor2]
                },
                backward_enabled: false,
                output: Output
@@ -65,7 +65,7 @@ defmodule Pratipad.Dataflow.Test do
       assert dataflow == %Dataflow{
                input: Input,
                forward: %Forward{
-                 processors: [TestProcessor],
+                 processors: [TestProcessor]
                },
                backward_enabled: true,
                output: Output

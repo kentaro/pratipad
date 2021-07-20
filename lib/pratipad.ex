@@ -36,12 +36,13 @@ defmodule Pratipad do
     {:ok, broadway} =
       DynamicSupervisor.start_child(Pratipad.Supervisor, {
         Pratipad.Broadway.Forward,
-        config[:input] ++ [
-          context: [
-            message_handler: message_handler,
-            output_handler: output_handler
+        config[:input] ++
+          [
+            context: [
+              message_handler: message_handler,
+              output_handler: output_handler
+            ]
           ]
-        ]
       })
 
     %{
@@ -59,11 +60,12 @@ defmodule Pratipad do
         {:ok, broadway} =
           DynamicSupervisor.start_child(Pratipad.Supervisor, {
             Pratipad.Broadway.Backward,
-            config[:input] ++ [
-              context: [
-                output_handler: output_handler
+            config[:input] ++
+              [
+                context: [
+                  output_handler: output_handler
+                ]
               ]
-            ]
           })
 
         %{
