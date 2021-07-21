@@ -2,15 +2,15 @@ defmodule Pratipad.Dataflow.Test do
   use ExUnit.Case, async: true
 
   alias Pratipad.Dataflow
-  alias Pratipad.Dataflow.{Input, Output, Forward}
+  alias Pratipad.Dataflow.{Push, Pull, Output, Forward}
 
   describe "declare dataflow with module" do
     defmodule TestDataflow do
       use Pratipad.Dataflow
-      alias Pratipad.Dataflow.{Input, Output}
+      alias Pratipad.Dataflow.{Push, Output}
 
       def declare() do
-        Input ~> TestProcessor ~> Output
+        Push ~> TestProcessor ~> Output
       end
     end
 
@@ -18,7 +18,7 @@ defmodule Pratipad.Dataflow.Test do
       dataflow = TestDataflow.declare()
 
       assert dataflow == %Dataflow{
-               input: Input,
+               mode: :push,
                forward: %Forward{
                  processors: [TestProcessor]
                },
@@ -31,13 +31,13 @@ defmodule Pratipad.Dataflow.Test do
   describe "declare dataflow with DSL" do
     use Pratipad.Dataflow.DSL
     alias Pratipad.Dataflow
-    alias Pratipad.Dataflow.{Input, Output}
+    alias Pratipad.Dataflow.{Push, Pull, Output}
 
     test "dataflow has a single processor" do
-      dataflow = Input ~> TestProcessor ~> Output
+      dataflow = Push ~> TestProcessor ~> Output
 
       assert dataflow == %Dataflow{
-               input: Input,
+               mode: :push,
                forward: %Forward{
                  processors: [TestProcessor]
                },
@@ -47,10 +47,10 @@ defmodule Pratipad.Dataflow.Test do
     end
 
     test "dataflow has multiple processors" do
-      dataflow = Input ~> TestProcessor1 ~> TestProcessor2 ~> Output
+      dataflow = Push ~> TestProcessor1 ~> TestProcessor2 ~> Output
 
       assert dataflow == %Dataflow{
-               input: Input,
+               mode: :push,
                forward: %Forward{
                  processors: [TestProcessor1, TestProcessor2]
                },
@@ -60,10 +60,10 @@ defmodule Pratipad.Dataflow.Test do
     end
 
     test "dataflow supports backward data flow" do
-      dataflow = Input <~> TestProcessor <~> Output
+      dataflow = Push <~> TestProcessor <~> Output
 
       assert dataflow == %Dataflow{
-               input: Input,
+               mode: :push,
                forward: %Forward{
                  processors: [TestProcessor]
                },

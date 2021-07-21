@@ -1,5 +1,5 @@
 defmodule Pratipad.Dataflow do
-  defstruct [:input, :forward, :backward_enabled, :output]
+  defstruct [:mode, :forward, :backward_enabled, :output]
 
   defmodule Forward do
     defstruct [:processors]
