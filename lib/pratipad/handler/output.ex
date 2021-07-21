@@ -4,7 +4,8 @@ defmodule Pratipad.Handler.Output do
 
   @impl GenServer
   def init(opts \\ []) do
-    name = opts[:name]
+    name = opts[:name] || raise("opts[:name] is mandatory")
+
     :global.register_name(name, self())
 
     {:ok, %{clients: []}}

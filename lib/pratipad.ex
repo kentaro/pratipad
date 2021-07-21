@@ -8,14 +8,12 @@ defmodule Pratipad do
 
   @impl GenServer
   def init(_opts \\ []) do
-    forward_config = Application.fetch_env!(:pratipad, :forward)
-    backward_config = Application.fetch_env!(:pratipad, :backward)
     dataflow_module = Application.fetch_env!(:pratipad, :dataflow)
 
     dataflow = dataflow_module.declare()
 
-    forward = start_broadway_for(:forward, forward_config, dataflow)
-    backward = start_broadway_for(:backward, backward_config, dataflow)
+    forward = start_broadway_for(:forward, dataflow)
+    backward = start_broadway_for(:backward, dataflow)
 
     {:ok,
      %{
@@ -29,20 +27,17 @@ defmodule Pratipad do
     GenServer.start_link(__MODULE__, opts)
   end
 
-  defp start_broadway_for(:forward, config, dataflow) do
+  defp start_broadway_for(:forward, dataflow) do
     {:ok, message_handler} = start_message_handler(dataflow)
-    {:ok, output_handler} = start_output_handler(config[:output])
+    {:ok, output_handler} = start_output_handler(name: :pratipad_forwarder_output)
 
     {:ok, broadway} =
       DynamicSupervisor.start_child(Pratipad.Supervisor, {
         Pratipad.Broadway.Forward,
-        config[:input] ++
-          [
-            context: [
-              message_handler: message_handler,
-              output_handler: output_handler
-            ]
-          ]
+        build_broadway_config(dataflow.mode, :pratipad_forwarder_input,
+          message_handler: message_handler,
+          output_handler: output_handler
+        )
       })
 
     %{
@@ -52,35 +47,43 @@ defmodule Pratipad do
     }
   end
 
-  defp start_broadway_for(:backward, config, dataflow) do
-    cond do
-      config && dataflow.backward_enabled ->
-        {:ok, output_handler} = start_output_handler(config[:output])
+  defp start_broadway_for(:backward, dataflow) do
+    if dataflow.backward_enabled do
+      {:ok, output_handler} = start_output_handler(name: :pratipad_backwarder_output)
 
-        {:ok, broadway} =
-          DynamicSupervisor.start_child(Pratipad.Supervisor, {
-            Pratipad.Broadway.Backward,
-            config[:input] ++
-              [
-                context: [
-                  output_handler: output_handler
-                ]
-              ]
-          })
+      {:ok, broadway} =
+        DynamicSupervisor.start_child(Pratipad.Supervisor, {
+          Pratipad.Broadway.Backward,
+          build_broadway_config(dataflow.mode, :pratipad_backwarder_input, output_handler: output_handler)
+        })
 
-        %{
-          broadway: broadway,
-          output_handler: output_handler
-        }
-
-      !config != !dataflow.backward_enabled ->
-        raise(
-          "Both the config and dataflow declaration are set in order to enable backward dataflow: #{inspect(dataflow)}"
-        )
-
-      !config && !dataflow.backward_enabled ->
-        nil
+      %{
+        broadway: broadway,
+        output_handler: output_handler
+      }
     end
+  end
+
+  defp build_broadway_config(dataflow_mode, receiver_name, context) do
+    [
+      producer: [
+        module:
+          {OffBroadwayOtpDistribution.Producer,
+           [
+             mode: dataflow_mode,
+             receiver: [
+               name: receiver_name
+             ]
+           ]}
+      ],
+      processors: [
+        default: [concurrency: 1]
+      ],
+      batchers: [
+        default: [concurrency: 1]
+      ],
+      context: context
+    ]
   end
 
   defp start_message_handler(dataflow) do

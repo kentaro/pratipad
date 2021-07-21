@@ -14,8 +14,14 @@ defmodule Pratipad.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger],
-      mod: {Pratipad.Application, []}
+      mod: {Pratipad.Application, []},
+      registered: [
+        :pratipad_forwarder_input,
+        :pratipad_forwarder_output,
+        :pratipad_backwarder_input,
+        :pratipad_backwarder_output
+      ],
+      extra_applications: [:logger]
     ]
   end
 
