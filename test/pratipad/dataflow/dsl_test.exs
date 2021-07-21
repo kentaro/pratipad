@@ -5,8 +5,8 @@ defmodule Pratipad.Dataflow.DSL.Test do
   alias Pratipad.Dataflow
   alias Pratipad.Dataflow.{Push, Demand, Pull, Forward}
 
-  describe "declare push dataflow with DSL" do
-    test "dataflow has a single processor" do
+  describe "When a push dataflow is declared" do
+    test "it can have a single processor" do
       dataflow = Push ~> TestProcessor ~> Output
 
       assert dataflow == %Dataflow{
@@ -18,19 +18,7 @@ defmodule Pratipad.Dataflow.DSL.Test do
              }
     end
 
-    test "dataflow has multiple processors" do
-      dataflow = Push ~> TestProcessor1 ~> TestProcessor2 ~> Output
-
-      assert dataflow == %Dataflow{
-               mode: :push,
-               forward: %Forward{
-                 processors: [TestProcessor1, TestProcessor2]
-               },
-               backward_enabled: false
-             }
-    end
-
-    test "dataflow supports backward data flow" do
+    test "it can be bidirectical" do
       dataflow = Push <~> TestProcessor <~> Output
 
       assert dataflow == %Dataflow{
@@ -43,8 +31,8 @@ defmodule Pratipad.Dataflow.DSL.Test do
     end
   end
 
-  describe "declare demand dataflow with DSL" do
-    test "dataflow has a single processor" do
+  describe "When a demand dataflow is declared" do
+    test "it can have a single processor" do
       dataflow = Demand ~> TestProcessor ~> Output
 
       assert dataflow == %Dataflow{
@@ -56,19 +44,7 @@ defmodule Pratipad.Dataflow.DSL.Test do
              }
     end
 
-    test "dataflow has multiple processors" do
-      dataflow = Demand ~> TestProcessor1 ~> TestProcessor2 ~> Output
-
-      assert dataflow == %Dataflow{
-               mode: :pull,
-               forward: %Forward{
-                 processors: [TestProcessor1, TestProcessor2]
-               },
-               backward_enabled: false
-             }
-    end
-
-    test "dataflow supports backward data flow" do
+    test "it can be bidirectical" do
       dataflow = Demand <~> TestProcessor <~> Output
 
       assert dataflow == %Dataflow{
@@ -81,14 +57,8 @@ defmodule Pratipad.Dataflow.DSL.Test do
     end
   end
 
-  describe "declare pull dataflow with DSL" do
-    test "pull mode can be enabled only for bidirectional dataflow" do
-      assert_raise ArgumentError, "pull mode can be enabled only for bidirectional dataflow", fn ->
-        Pull ~> TestProcessor ~> Output
-      end
-    end
-
-    test "dataflow has a single processor" do
+  describe "When a pull dataflow is declared" do
+    test "it can have a single processor" do
       dataflow = Pull <~> TestProcessor <~> Output
 
       assert dataflow == %Dataflow{
@@ -100,27 +70,59 @@ defmodule Pratipad.Dataflow.DSL.Test do
              }
     end
 
-    test "dataflow has multiple processors" do
-      dataflow = Pull <~> TestProcessor1 <~> TestProcessor2 <~> Output
+    test "it cannot be unidirectical" do
+      assert_raise ArgumentError, "pull mode can be enabled only for bidirectional dataflow", fn ->
+        Pull ~> TestProcessor ~> Output
+      end
+    end
+  end
+
+  describe "When a dataflow is declared" do
+    test "it can have multiple processors" do
+      dataflow = Push ~> TestProcessor1 ~> TestProcessor2 ~> Output
 
       assert dataflow == %Dataflow{
                mode: :push,
                forward: %Forward{
                  processors: [TestProcessor1, TestProcessor2]
                },
-               backward_enabled: true
+               backward_enabled: false
              }
     end
 
-    test "dataflow supports backward data flow" do
-      dataflow = Pull <~> TestProcessor <~> Output
+    test "it can have multiple processors as a list" do
+      dataflow = Push ~> [TestProcessor1, TestProcessor2] ~> Output
 
       assert dataflow == %Dataflow{
                mode: :push,
                forward: %Forward{
-                 processors: [TestProcessor]
+                 processors: [[TestProcessor1, TestProcessor2]]
                },
-               backward_enabled: true
+               backward_enabled: false
+             }
+    end
+
+    test "it can have multiple processors as a tuple" do
+      dataflow = Push ~> {TestProcessor1, TestProcessor2} ~> Output
+
+      assert dataflow == %Dataflow{
+               mode: :push,
+               forward: %Forward{
+                 processors: [{TestProcessor1, TestProcessor2}]
+               },
+               backward_enabled: false
+             }
+    end
+
+    test "it can have multiple processors as various data structures" do
+      dataflow = Push ~> TestProcessor1 ~> [TestProcessor2, TestProcessor3] ~> {TestProcessor4, TestProcessor5} ~> Output
+
+      assert dataflow == %Dataflow{
+               mode: :push,
+               forward: %Forward{
+                 processors: [TestProcessor1, [TestProcessor2, TestProcessor3], {TestProcessor4, TestProcessor5}]
+               },
+               backward_enabled: false
              }
     end
   end
