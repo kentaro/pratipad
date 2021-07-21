@@ -2,11 +2,12 @@ defmodule Pratipad.Dataflow.DSL do
   defmacro __using__(_opts) do
     quote do
       alias Pratipad.Dataflow
-      alias Pratipad.Dataflow.{Push, Demand, Forward}
+      alias Pratipad.Dataflow.{Push, Demand, Pull, Forward}
 
       @input_mode_map %{
         Push => :push,
-        Demand => :pull
+        Demand => :pull,
+        Pull => :push
       }
 
       defmacro left ~> right do
@@ -32,9 +33,24 @@ defmodule Pratipad.Dataflow.DSL do
         }
       end
 
+      defp handle_unidirectional_op(left, right)
+           when left == Pull do
+        raise(ArgumentError, message: "pull mode can be enabled only for bidirectional dataflow")
+      end
+
       defp handle_bidirectional_op(left, right) do
-        handle_unidirectional_op(left, right)
-        |> Map.put(:backward_enabled, true)
+        if left == Pull do
+          %Dataflow{
+            mode: @input_mode_map[left],
+            forward: %Forward{
+              processors: [right]
+            },
+            backward_enabled: true
+          }
+        else
+          handle_unidirectional_op(left, right)
+          |> Map.put(:backward_enabled, true)
+        end
       end
 
       defp handle_unidirectional_op(%Dataflow{} = left, Output = right) do
