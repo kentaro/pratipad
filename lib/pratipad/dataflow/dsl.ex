@@ -2,7 +2,7 @@ defmodule Pratipad.Dataflow.DSL do
   defmacro __using__(_opts) do
     quote do
       alias Pratipad.Dataflow
-      alias Pratipad.Dataflow.{Push, Pull, Output, Forward}
+      alias Pratipad.Dataflow.{Push, Pull, Forward}
 
       @input_mode_map %{
         Push => :push,
@@ -43,8 +43,7 @@ defmodule Pratipad.Dataflow.DSL do
           forward: %Forward{
             processors: left.forward.processors
           },
-          backward_enabled: false,
-          output: right
+          backward_enabled: false
         }
       end
 

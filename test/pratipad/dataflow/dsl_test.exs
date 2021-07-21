@@ -3,7 +3,7 @@ defmodule Pratipad.Dataflow.DSL.Test do
 
   use Pratipad.Dataflow.DSL
   alias Pratipad.Dataflow
-  alias Pratipad.Dataflow.{Push, Pull, Output, Forward}
+  alias Pratipad.Dataflow.{Push, Pull, Forward}
 
   describe "declare push dataflow with DSL" do
     test "dataflow has a single processor" do
@@ -14,8 +14,7 @@ defmodule Pratipad.Dataflow.DSL.Test do
                forward: %Forward{
                  processors: [TestProcessor]
                },
-               backward_enabled: false,
-               output: Output
+               backward_enabled: false
              }
     end
 
@@ -27,8 +26,7 @@ defmodule Pratipad.Dataflow.DSL.Test do
                forward: %Forward{
                  processors: [TestProcessor1, TestProcessor2]
                },
-               backward_enabled: false,
-               output: Output
+               backward_enabled: false
              }
     end
 
@@ -40,8 +38,7 @@ defmodule Pratipad.Dataflow.DSL.Test do
                forward: %Forward{
                  processors: [TestProcessor]
                },
-               backward_enabled: true,
-               output: Output
+               backward_enabled: true
              }
     end
   end
@@ -55,8 +52,7 @@ defmodule Pratipad.Dataflow.DSL.Test do
                forward: %Forward{
                  processors: [TestProcessor]
                },
-               backward_enabled: false,
-               output: Output
+               backward_enabled: false
              }
     end
 
@@ -68,8 +64,7 @@ defmodule Pratipad.Dataflow.DSL.Test do
                forward: %Forward{
                  processors: [TestProcessor1, TestProcessor2]
                },
-               backward_enabled: false,
-               output: Output
+               backward_enabled: false
              }
     end
 
@@ -81,8 +76,7 @@ defmodule Pratipad.Dataflow.DSL.Test do
                forward: %Forward{
                  processors: [TestProcessor]
                },
-               backward_enabled: true,
-               output: Output
+               backward_enabled: true
              }
     end
   end

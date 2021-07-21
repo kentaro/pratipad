@@ -2,12 +2,12 @@ defmodule Pratipad.Dataflow.Test do
   use ExUnit.Case, async: true
 
   alias Pratipad.Dataflow
-  alias Pratipad.Dataflow.{Push, Pull, Output, Forward}
+  alias Pratipad.Dataflow.{Push, Pull, Forward}
 
   describe "declare dataflow with a module" do
     defmodule TestDataflow do
       use Pratipad.Dataflow
-      alias Pratipad.Dataflow.{Push, Output}
+      alias Pratipad.Dataflow.Push
 
       def declare() do
         Push ~> TestProcessor ~> Output
@@ -22,8 +22,7 @@ defmodule Pratipad.Dataflow.Test do
                forward: %Forward{
                  processors: [TestProcessor]
                },
-               backward_enabled: false,
-               output: Output
+               backward_enabled: false
              }
     end
   end
