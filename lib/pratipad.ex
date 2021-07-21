@@ -9,7 +9,6 @@ defmodule Pratipad do
   @impl GenServer
   def init(_opts \\ []) do
     dataflow_module = Application.fetch_env!(:pratipad, :dataflow)
-
     dataflow = dataflow_module.declare()
 
     forward = start_broadway_for(:forward, dataflow)
@@ -31,10 +30,15 @@ defmodule Pratipad do
     {:ok, message_handler} = start_message_handler(dataflow)
     {:ok, output_handler} = start_output_handler(name: :pratipad_forwarder_output)
 
+    demand_config =
+      if dataflow.mode == :pull do
+        Application.fetch_env!(:pratipad, :demand)
+      end
+
     {:ok, broadway} =
       DynamicSupervisor.start_child(Pratipad.Supervisor, {
         Pratipad.Broadway.Forward,
-        build_broadway_config(dataflow.mode, :pratipad_forwarder_input,
+        build_broadway_config(dataflow.mode, :pratipad_forwarder_input, demand_config,
           message_handler: message_handler,
           output_handler: output_handler
         )
@@ -54,7 +58,9 @@ defmodule Pratipad do
       {:ok, broadway} =
         DynamicSupervisor.start_child(Pratipad.Supervisor, {
           Pratipad.Broadway.Backward,
-          build_broadway_config(dataflow.mode, :pratipad_backwarder_input, output_handler: output_handler)
+          build_broadway_config(:push, :pratipad_backwarder_input, nil,
+            output_handler: output_handler
+          )
         })
 
       %{
@@ -64,26 +70,46 @@ defmodule Pratipad do
     end
   end
 
-  defp build_broadway_config(dataflow_mode, receiver_name, context) do
-    [
-      producer: [
-        module:
-          {OffBroadwayOtpDistribution.Producer,
-           [
-             mode: dataflow_mode,
-             receiver: [
-               name: receiver_name
-             ]
-           ]}
-      ],
+  defp build_broadway_config(dataflow_mode, receiver_name, demand_config, context) do
+    producer_config = [
+      module:
+        {OffBroadwayOtpDistribution.Producer,
+         [
+           mode: dataflow_mode,
+           receiver: [
+             name: receiver_name
+           ]
+         ]}
+    ]
+
+    producer_config =
+      if demand_config && demand_config[:rate_limiting] do
+        producer_config ++ [rate_limiting: demand_config[:rate_limiting]]
+      else
+        producer_config
+      end
+
+    processors_config = [concurrency: 1]
+    processors_config =
+      if demand_config && demand_config[:count] do
+        processors_config ++ demand_config[:count]
+      else
+        processors_config
+      end
+
+    config = [
+      producer: producer_config,
       processors: [
-        default: [concurrency: 1]
+        default: processors_config
       ],
       batchers: [
         default: [concurrency: 1]
       ],
       context: context
     ]
+
+    Logger.debug(config)
+    config
   end
 
   defp start_message_handler(dataflow) do

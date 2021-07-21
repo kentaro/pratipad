@@ -2,7 +2,7 @@ defmodule Pratipad.Dataflow.Test do
   use ExUnit.Case, async: true
 
   alias Pratipad.Dataflow
-  alias Pratipad.Dataflow.{Push, Pull, Forward}
+  alias Pratipad.Dataflow.{Push, Demand, Forward}
 
   describe "declare dataflow with a module" do
     defmodule TestDataflow do

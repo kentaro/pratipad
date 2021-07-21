@@ -3,7 +3,7 @@ defmodule Pratipad.Dataflow.DSL.Test do
 
   use Pratipad.Dataflow.DSL
   alias Pratipad.Dataflow
-  alias Pratipad.Dataflow.{Push, Pull, Forward}
+  alias Pratipad.Dataflow.{Push, Demand, Forward}
 
   describe "declare push dataflow with DSL" do
     test "dataflow has a single processor" do
@@ -43,9 +43,9 @@ defmodule Pratipad.Dataflow.DSL.Test do
     end
   end
 
-  describe "declare pull dataflow with DSL" do
+  describe "declare demand dataflow with DSL" do
     test "dataflow has a single processor" do
-      dataflow = Pull ~> TestProcessor ~> Output
+      dataflow = Demand ~> TestProcessor ~> Output
 
       assert dataflow == %Dataflow{
                mode: :pull,
@@ -57,7 +57,7 @@ defmodule Pratipad.Dataflow.DSL.Test do
     end
 
     test "dataflow has multiple processors" do
-      dataflow = Pull ~> TestProcessor1 ~> TestProcessor2 ~> Output
+      dataflow = Demand ~> TestProcessor1 ~> TestProcessor2 ~> Output
 
       assert dataflow == %Dataflow{
                mode: :pull,
@@ -69,7 +69,7 @@ defmodule Pratipad.Dataflow.DSL.Test do
     end
 
     test "dataflow supports backward data flow" do
-      dataflow = Pull <~> TestProcessor <~> Output
+      dataflow = Demand <~> TestProcessor <~> Output
 
       assert dataflow == %Dataflow{
                mode: :pull,

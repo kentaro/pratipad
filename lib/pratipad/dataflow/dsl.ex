@@ -2,11 +2,11 @@ defmodule Pratipad.Dataflow.DSL do
   defmacro __using__(_opts) do
     quote do
       alias Pratipad.Dataflow
-      alias Pratipad.Dataflow.{Push, Pull, Forward}
+      alias Pratipad.Dataflow.{Push, Demand, Forward}
 
       @input_mode_map %{
         Push => :push,
-        Pull => :pull
+        Demand => :pull
       }
 
       defmacro left ~> right do
@@ -22,7 +22,7 @@ defmodule Pratipad.Dataflow.DSL do
       end
 
       defp handle_unidirectional_op(left, right)
-           when left == Push or left == Pull do
+           when left == Push or left == Demand do
         %Dataflow{
           mode: @input_mode_map[left],
           forward: %Forward{
