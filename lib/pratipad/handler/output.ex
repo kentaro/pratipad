@@ -48,7 +48,7 @@ defmodule Pratipad.Handler.Output do
 
   @impl GenServer
   def handle_info({:DOWN, ref, _, pid, reason}, state) do
-    Logger.error("client down (#{reason}): #{inspect(ref)}, #{inspect(pid)}")
+    Logger.error("[handler.output] Client down (#{inspect(reason)}): ref (#{inspect(ref)}), pid (#{inspect(pid)})")
     clients = unregister_client(state.clients, pid)
 
     {:noreply, %{state | clients: clients}}
