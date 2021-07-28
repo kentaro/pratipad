@@ -6,4 +6,4 @@ authors:
     orcid: "https://orcid.org/0000-0002-9111-2950"
 title: "Pratipad: A Declarative Framework for Describing Bidirectional Data Flow in IoT Systems with Elixir"
 url: "https://github.com/kentaro/pratipad"
-license: MIT
+license: "MIT"
