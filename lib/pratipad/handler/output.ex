@@ -39,7 +39,7 @@ defmodule Pratipad.Handler.Output do
     |> Enum.each(fn message ->
       state.clients
       |> Enum.each(fn {client_pid, _} ->
-        GenServer.cast(client_pid, {:backward_message, message})
+        GenServer.cast(client_pid, {:forward_message, message})
       end)
     end)
 
