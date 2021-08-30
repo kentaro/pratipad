@@ -4,11 +4,7 @@ defmodule Pratipad.Handler.Message do
   @impl GenServer
   def init(opts) do
     dataflow = opts[:dataflow]
-
-    dataflow.forward.processors
-    |> Enum.each(fn processor ->
-      processor.start_link()
-    end)
+    start_processors(dataflow.forward.processors)
 
     {:ok,
      %{
@@ -24,10 +20,51 @@ defmodule Pratipad.Handler.Message do
   def handle_call({:process, message}, _from, state) do
     message =
       state.dataflow.forward.processors
-      |> Enum.reduce(message, fn processor, message ->
-        GenServer.call(processor, {:process, message})
+      |> Enum.reduce(message, fn processors, message ->
+        process_message(processors, message)
       end)
 
     {:reply, message, state}
+  end
+
+  defp start_processors(processors) do
+    processors
+    |> Enum.reduce([], fn p, acc ->
+      acc ++ processors_to_list(p)
+    end)
+    |> Enum.each(&start_link/1)
+  end
+
+  defp processors_to_list(processors) when is_list(processors) do
+    processors
+  end
+
+  defp processors_to_list(processors) when is_tuple(processors) do
+    Tuple.to_list(processors)
+  end
+
+  defp processors_to_list(processors) do
+    [processors]
+  end
+
+  defp process_message(processors, message) when is_list(processors) do
+    processors
+    |> Enum.reduce(message, fn processor, message ->
+      GenServer.call(processor, {:process, message})
+    end)
+  end
+
+  defp process_message(processors, message) when is_tuple(processors) do
+    Tuple.to_list(processors)
+    |> Enum.map(fn processor ->
+      Task.async(fn -> GenServer.call(processor, {:process, message}) end)
+    end)
+    |> Enum.map(&Task.await/1)
+
+    message
+  end
+
+  defp process_message(processors, message) do
+    GenServer.call(processors, {:process, message})
   end
 end
