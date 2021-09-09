@@ -21,7 +21,8 @@ defmodule Pratipad.Handler.Message do
     message =
       state.dataflow.forward.processors
       |> Enum.reduce(message, fn processors, message ->
-        process_message(processors, message)
+        message = process_message(processors, message)
+        message
       end)
 
     {:reply, message, state}
@@ -32,7 +33,9 @@ defmodule Pratipad.Handler.Message do
     |> Enum.reduce([], fn p, acc ->
       acc ++ processors_to_list(p)
     end)
-    |> Enum.each(&start_link/1)
+    |> Enum.each(fn p ->
+      p.start_link()
+    end)
   end
 
   defp processors_to_list(processors) when is_list(processors) do

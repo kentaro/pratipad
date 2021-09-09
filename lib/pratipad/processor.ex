@@ -18,8 +18,8 @@ defmodule Pratipad.Processor do
       def handle_call({:process, message}, _from, state) do
         message =
           message
-          |> Message.update_data(fn message ->
-            process(message, state)
+          |> Message.update_data(fn data ->
+            process(data, state)
           end)
 
         {:reply, message, state}

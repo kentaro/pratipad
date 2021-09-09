@@ -2,7 +2,7 @@ defmodule Pratipad.Dataflow.DSL do
   defmacro __using__(_opts) do
     quote do
       alias Pratipad.Dataflow
-      alias Pratipad.Dataflow.{Push, Demand, Pull, Forward}
+      alias Pratipad.Dataflow.{Push, Demand, Pull, Forward, Output}
 
       @input_mode_map %{
         Push => :push,
