@@ -3,7 +3,7 @@ defmodule Pratipad.Dataflow.DSL.Test do
 
   use Pratipad.Dataflow.DSL
   alias Pratipad.Dataflow
-  alias Pratipad.Dataflow.{Push, Demand, Pull, Forward}
+  alias Pratipad.Dataflow.{Push, Demand, Pull, Forward, Output}
 
   describe "When a push dataflow is declared" do
     test "it can have a single processor" do

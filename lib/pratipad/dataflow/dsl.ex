@@ -33,8 +33,7 @@ defmodule Pratipad.Dataflow.DSL do
         }
       end
 
-      defp handle_unidirectional_op(left, right)
-           when left == Pull do
+      defp handle_unidirectional_op(left, right) when left == Pull do
         raise(ArgumentError, message: "pull mode can be enabled only for bidirectional dataflow")
       end
 

@@ -59,7 +59,7 @@ defmodule Pratipad.Handler.Message.Test do
     end
   end
 
-  test "single dataflow" do
+  test "it can handle a dataflow with a single processor" do
     dataflow = Push ~> Add1 ~> Output
     {:ok, handler} = Pratipad.Handler.Message.start_link(dataflow: dataflow)
 
@@ -69,7 +69,7 @@ defmodule Pratipad.Handler.Message.Test do
     assert processed.data == 1
   end
 
-  test "multiple dataflow" do
+  test "it can handle a dataflow with multiple processors" do
     dataflow = Push ~> Add1 ~> Add2 ~> Output
     {:ok, handler} = Pratipad.Handler.Message.start_link(dataflow: dataflow)
 
@@ -79,7 +79,7 @@ defmodule Pratipad.Handler.Message.Test do
     assert processed.data == 3
   end
 
-  test "sequencial dataflow" do
+  test "it can handle a dataflow with sequential processors" do
     dataflow = Push ~> [Add1, Add2] ~> Output
     {:ok, handler} = Pratipad.Handler.Message.start_link(dataflow: dataflow)
 
@@ -89,7 +89,7 @@ defmodule Pratipad.Handler.Message.Test do
     assert processed.data == 3
   end
 
-  test "parallel dataflow" do
+  test "it can handle a dataflow with parallel processors" do
     dataflow = Push ~> {Add1, Add2} ~> Output
     {:ok, handler} = Pratipad.Handler.Message.start_link(dataflow: dataflow)
 
@@ -99,7 +99,7 @@ defmodule Pratipad.Handler.Message.Test do
     assert processed.data == 0
   end
 
-  test "conbination of sequencial and parallel dataflow" do
+  test "it can handle a dataflow with a conbination of sequencial and parallel processors" do
     dataflow = Push ~> [Add1, Add2] ~> {Add3, Add4} ~> Output
     {:ok, handler} = Pratipad.Handler.Message.start_link(dataflow: dataflow)
 
@@ -109,7 +109,7 @@ defmodule Pratipad.Handler.Message.Test do
     assert processed.data == 3
   end
 
-  test "conbination of parallel and sequenciall dataflow" do
+  test "it can handle a dataflow with a conbination of parallel and sequencial processors" do
     dataflow = Push ~> {Add1, Add2} ~> [Add3, Add4] ~> Output
     {:ok, handler} = Pratipad.Handler.Message.start_link(dataflow: dataflow)
 
