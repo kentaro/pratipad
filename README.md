@@ -1,6 +1,6 @@
 # Pratipad
 
-**TODO: Add description**
+Pratipad is a declarative framework for describing bidirectional dataflow.
 
 ## Installation
 
@@ -18,4 +18,3 @@ end
 Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
 and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
 be found at [https://hexdocs.pm/pratipad](https://hexdocs.pm/pratipad).
-
