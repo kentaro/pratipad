@@ -8,11 +8,45 @@ defmodule Pratipad.Handler.Output do
 
     :global.register_name(name, self())
 
-    {:ok, %{clients: []}}
+    {:ok,
+     %{
+       server_name: opts[:server_name],
+       clients: []
+     }, {:continue, :init_connection}}
   end
 
   def start_link(opts) do
     GenServer.start_link(__MODULE__, opts, name: opts[:name])
+  end
+
+  @impl GenServer
+  def handle_continue(:init_connection, state) do
+    if state.server_name do
+      send(self(), :connect_to_server)
+    end
+
+    {:noreply, state}
+  end
+
+  @impl GenServer
+  def handle_info(:connect_to_server, state) do
+    :global.sync()
+    :global.whereis_name(state.server_name)
+
+    # TODO: reconnect the server when it's down
+
+    {:noreply, state}
+  end
+
+  @impl GenServer
+  def handle_info({:DOWN, ref, _, pid, reason}, state) do
+    Logger.error(
+      "[handler.output] Client down (#{inspect(reason)}): ref (#{inspect(ref)}), pid (#{inspect(pid)})"
+    )
+
+    clients = unregister_client(state.clients, pid)
+
+    {:noreply, %{state | clients: clients}}
   end
 
   @impl GenServer
@@ -44,14 +78,6 @@ defmodule Pratipad.Handler.Output do
     end)
 
     {:reply, messages, state}
-  end
-
-  @impl GenServer
-  def handle_info({:DOWN, ref, _, pid, reason}, state) do
-    Logger.error("[handler.output] Client down (#{inspect(reason)}): ref (#{inspect(ref)}), pid (#{inspect(pid)})")
-    clients = unregister_client(state.clients, pid)
-
-    {:noreply, %{state | clients: clients}}
   end
 
   defp unregister_client(clients, client_pid) do

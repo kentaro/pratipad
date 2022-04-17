@@ -28,7 +28,12 @@ defmodule Pratipad do
 
   defp start_broadway_for(:forward, dataflow) do
     {:ok, message_handler} = start_message_handler(dataflow)
-    {:ok, output_handler} = start_output_handler(name: :pratipad_forwarder_output)
+
+    server_name = Application.fetch_env!(:pratipad, :server_name)
+    {:ok, output_handler} = start_output_handler(
+      name: :pratipad_forwarder_output,
+      server_name: server_name
+    )
 
     demand_config =
       if dataflow.mode == :pull do
