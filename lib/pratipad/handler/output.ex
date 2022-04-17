@@ -32,6 +32,7 @@ defmodule Pratipad.Handler.Output do
   def handle_info(:connect_to_server, state) do
     :global.sync()
     :global.whereis_name(state.server_name)
+    GenServer.cast(state.server_name, :ready)
 
     # TODO: reconnect the server when it's down
 
